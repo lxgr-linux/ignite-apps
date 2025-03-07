@@ -2,6 +2,7 @@ package gen
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -22,12 +23,12 @@ import (
 const cacheFileName = "ignite_cache.db"
 
 type generator struct {
-	//modulePath gomodulepath.Path
-	config    *chainconfig.Config
-	storage   cache.Storage
-	appPath   string
-	protoPath string
-	outPath   string
+	modulePath gomodulepath.Path
+	config     *chainconfig.Config
+	storage    cache.Storage
+	appPath    string
+	protoPath  string
+	outPath    string
 	/*csModulePath string*/
 }
 
@@ -73,17 +74,25 @@ func New(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.ClientAPI)
 		}
 	}
 
+	modPath, _, err := gomodulepath.Find(ch.AppPath())
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("modPath: %s", modPath.Package)
+
 	/*err = InstallDepTools(ctx)
 	if err != nil {
 		return nil, err
 		}*/
 
 	gen := generator{
-		outPath:   out,
-		config:    config,
-		storage:   storage,
-		appPath:   ch.AppPath(),
-		protoPath: filepath.Join(ch.AppPath(), config.Build.Proto.Path),
+		modulePath: modPath,
+		outPath:    out,
+		config:     config,
+		storage:    storage,
+		appPath:    ch.AppPath(),
+		protoPath:  filepath.Join(ch.AppPath(), config.Build.Proto.Path),
 	}
 
 	return &gen, nil
@@ -107,20 +116,6 @@ func getChain(cmd *plugin.ExecutedCommand, chainOption ...chain.Option) (*chain.
 		return nil, err
 	}
 	return chain.New(absPath, chainOption...)
-}
-
-func getPath(cmd *plugin.ExecutedCommand) (gomodulepath.Path, string, error) {
-	flags, err := cmd.NewFlags()
-	if err != nil {
-		return gomodulepath.Path{}, "", err
-	}
-	path, _ := flags.GetString("path")
-	absPath, err := filepath.Abs(path)
-	if err != nil {
-		return gomodulepath.Path{}, "", err
-	}
-
-	return gomodulepath.Find(absPath)
 }
 
 func getModulePath(rawPath string) string {

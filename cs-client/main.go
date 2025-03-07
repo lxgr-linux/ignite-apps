@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	hplugin "github.com/hashicorp/go-plugin"
 	"github.com/ignite/apps/cs-client/cmd"
@@ -27,7 +26,6 @@ func (app) Execute(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.
 
 	g, err := gen.New(ctx, cmd, api)
 	if err != nil {
-		fmt.Println(err)
 		return errors.Errorf("failed to init genrator: %s", err)
 	}
 
@@ -40,9 +38,16 @@ func (app) Execute(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.
 	gen.InstallDepTools(ctx)
 	session.StopSpinner()
 
-	return g.GenerateClients(ctx)
+	err = g.GenerateClients(ctx)
+	if err != nil {
+		return err
+	}
 
-	//return nil
+	err = g.GenerateCsproj()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (app) ExecuteHookPre(context.Context, *plugin.ExecutedHook, plugin.ClientAPI) error {
