@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	hplugin "github.com/hashicorp/go-plugin"
-	"github.com/ignite/cli/v28/ignite/pkg/cliui"
-	"github.com/ignite/cli/v28/ignite/services/plugin"
-
 	"github.com/ignite/apps/cs-client/cmd"
 	"github.com/ignite/apps/cs-client/gen"
+	"github.com/ignite/cli/v28/ignite/pkg/cliui"
+	"github.com/ignite/cli/v28/ignite/pkg/errors"
+	"github.com/ignite/cli/v28/ignite/services/plugin"
 )
 
 type app struct{}
@@ -20,14 +21,17 @@ func (app) Manifest(context.Context) (*plugin.Manifest, error) {
 	}, nil
 }
 
-func (app) Execute(ctx context.Context, _ *plugin.ExecutedCommand, api plugin.ClientAPI) error {
+func (app) Execute(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.ClientAPI) error {
 	session := cliui.New(cliui.StartSpinnerWithText("Testing spinner..."))
 	defer session.End()
 
-	g, err := gen.New(ctx, api)
+	g, err := gen.New(ctx, cmd, api)
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return errors.Errorf("failed to init genrator: %s", err)
 	}
+
+	_ = g
 
 	//time.Sleep(time.Second * 5)
 	session.StopSpinner()

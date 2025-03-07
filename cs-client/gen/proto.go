@@ -53,5 +53,5 @@ func (g generator) GenerateClients(ctx context.Context) error {
 		return err
 	}
 
-	return buf.Generate(ctx, g.protoPath, "./out", bufGenYaml)
+	return buf.Generate(ctx, g.protoPath, g.outPath, bufGenYaml)
 }

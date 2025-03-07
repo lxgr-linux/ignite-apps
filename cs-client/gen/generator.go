@@ -2,10 +2,10 @@ package gen
 
 import (
 	"context"
-	"fmt"
 	"path/filepath"
 	"strings"
 
+	"github.com/ignite/apps/cs-client/customconfig"
 	"github.com/ignite/cli/v28/ignite/config"
 	chainconfig "github.com/ignite/cli/v28/ignite/config/chain"
 	"github.com/ignite/cli/v28/ignite/pkg/cache"
@@ -27,34 +27,15 @@ type generator struct {
 	storage   cache.Storage
 	appPath   string
 	protoPath string
-	/*outPath      string
-	csModulePath string*/
+	outPath   string
+	/*csModulePath string*/
 }
 
-func New(ctx context.Context, api plugin.ClientAPI) (*generator, error) {
-	/*flags, err := cmd.NewFlags()
+func New(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.ClientAPI) (*generator, error) {
+	flags, err := cmd.NewFlags()
 	if err != nil {
 		return nil, err
 	}
-
-	c, err := getChain(cmd)
-	if err != nil {
-		return nil, err
-	}
-	config, err := c.Config()
-	if err != nil {
-		return nil, err
-	}
-
-	p, appPath, err := getPath(cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	outFlag, _ := flags.GetString("out")
-	if outFlag == "" {
-		outFlag = "./cs"
-		}*/
 
 	chainInfo, err := api.GetChainInfo(ctx)
 	if err != nil {
@@ -78,14 +59,27 @@ func New(ctx context.Context, api plugin.ClientAPI) (*generator, error) {
 		return nil, err
 	}
 
-	fmt.Println(ch.Name())
-
-	err = InstallDepTools(ctx)
+	yamlConfig, err := customconfig.Read(ch.ConfigPath())
 	if err != nil {
 		return nil, err
 	}
 
+	out, _ := flags.GetString("out")
+	if out == "" {
+		if yamlConfig.Client != nil && yamlConfig.Client.CsClient != nil {
+			out = yamlConfig.Client.CsClient.Path
+		} else {
+			out = "./cs"
+		}
+	}
+
+	/*err = InstallDepTools(ctx)
+	if err != nil {
+		return nil, err
+		}*/
+
 	gen := generator{
+		outPath:   out,
 		config:    config,
 		storage:   storage,
 		appPath:   ch.AppPath(),
