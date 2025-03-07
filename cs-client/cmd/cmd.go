@@ -1,13 +1,32 @@
 package cmd
 
-import "github.com/ignite/cli/v28/ignite/services/plugin"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/ignite/apps/cs-client/gen"
+	"github.com/ignite/cli/v28/ignite/services/plugin"
+)
 
 // GetCommands returns the list of spinner app commands.
 func GetCommands() []*plugin.Command {
 	return []*plugin.Command{
 		{
-			Use:   "spinner",
-			Short: "App spinner example",
+			Use:   "cs-client",
+			Short: "Generates csharp client",
+			Long:  "Generates csharp client",
+			Flags: []*plugin.Flag{
+				{Name: "out", Type: plugin.FlagTypeString, Usage: "csharp output directory"},
+				{
+					Name: "components",
+					Type: plugin.FlagTypeStringSlice,
+					Usage: fmt.Sprintf(
+						"components to be generated; options: [%s]",
+						strings.Join(gen.Component_stringValues(), ", "),
+					),
+				},
+			},
+			PlaceCommandUnder: "generate",
 		},
 	}
 }
