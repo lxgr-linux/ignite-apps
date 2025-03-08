@@ -28,7 +28,7 @@ func (g generator) createBufGenYaml() (string, error) {
 	model := bufGenYamlModel{
 		OutDir:        ".",
 		InDir:         g.protoPath,
-		PackagePrefix: "yes",
+		PackagePrefix: g.modulePath.RawPath,
 	}
 
 	wr := bytes.NewBuffer([]byte{})

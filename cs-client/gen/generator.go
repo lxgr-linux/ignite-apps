@@ -10,17 +10,16 @@ import (
 	"github.com/ignite/cli/v28/ignite/config"
 	chainconfig "github.com/ignite/cli/v28/ignite/config/chain"
 	"github.com/ignite/cli/v28/ignite/pkg/cache"
+	"github.com/ignite/cli/v28/ignite/pkg/dircache"
 	"github.com/ignite/cli/v28/ignite/pkg/errors"
 	"github.com/ignite/cli/v28/ignite/pkg/gomodulepath"
 	"github.com/ignite/cli/v28/ignite/services/chain"
 	"github.com/ignite/cli/v28/ignite/services/plugin"
 	"github.com/ignite/cli/v28/ignite/version"
-	/*chainConfig "github.com/ignite/cli/ignite/config/chain"
-	"github.com/ignite/cli/ignite/pkg/gomodulepath"
-	"github.com/ignite/cli/ignite/services/chain"
-	"github.com/ignite/cli/ignite/services/plugin"*/)
+)
 
 const cacheFileName = "ignite_cache.db"
+const flagClearCache = "clear-cache"
 
 type generator struct {
 	modulePath gomodulepath.Path
@@ -55,7 +54,7 @@ func New(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.ClientAPI)
 
 	//csModulePath := getModulePath(p.RawPath)
 
-	storage, err := newCache()
+	storage, err := newCache(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +121,17 @@ func getModulePath(rawPath string) string {
 	return strings.Join(strings.Split(rawPath, "/")[1:], ".")
 }
 
-func newCache() (cache.Storage, error) {
+func flagGetClearCache(cmd *plugin.ExecutedCommand) bool {
+	flags, err := cmd.NewFlags()
+	if err != nil {
+		return false
+	}
+
+	clearCache, _ := flags.GetBool(flagClearCache)
+	return clearCache
+}
+
+func newCache(cmd *plugin.ExecutedCommand) (cache.Storage, error) {
 	cacheRootDir, err := config.DirPath()
 	if err != nil {
 		return cache.Storage{}, err
@@ -134,6 +143,15 @@ func newCache() (cache.Storage, error) {
 	)
 	if err != nil {
 		return cache.Storage{}, err
+	}
+
+	if flagGetClearCache(cmd) {
+		if err := storage.Clear(); err != nil {
+			return cache.Storage{}, err
+		}
+		if err := dircache.ClearCache(); err != nil {
+			return cache.Storage{}, err
+		}
 	}
 
 	return storage, nil

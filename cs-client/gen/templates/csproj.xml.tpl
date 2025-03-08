@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<PackageId>{{ .Name }}</PackageId>
-		<Version>0.1,0</Version>
+		<Version>0.1.0</Version>
 		<Authors>lxgr</Authors>
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<Nullable>enable</Nullable>

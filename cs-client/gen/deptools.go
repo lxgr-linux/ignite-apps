@@ -10,7 +10,7 @@ func DepTools() []string {
 	return []string{
 		// buf build code generation.
 		"github.com/bufbuild/buf/cmd/buf@v1.50.0",
-		"github.com/DecentralCardGame/protoc-gen-cosmos-csharp@v0.1.2",
+		"github.com/DecentralCardGame/protoc-gen-cosmos-csharp@v0.1.3",
 	}
 }
 
