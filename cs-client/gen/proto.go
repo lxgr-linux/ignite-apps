@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/ignite/cli/v28/ignite/pkg/cosmosbuf"
+	"github.com/ignite/cli/v29/ignite/pkg/cosmosbuf"
 )
 
 //go:embed templates/buf.gen.yaml.tpl

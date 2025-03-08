@@ -6,9 +6,9 @@ import (
 	hplugin "github.com/hashicorp/go-plugin"
 	"github.com/ignite/apps/cs-client/cmd"
 	"github.com/ignite/apps/cs-client/gen"
-	"github.com/ignite/cli/v28/ignite/pkg/cliui"
-	"github.com/ignite/cli/v28/ignite/pkg/errors"
-	"github.com/ignite/cli/v28/ignite/services/plugin"
+	"github.com/ignite/cli/v29/ignite/pkg/cliui"
+	"github.com/ignite/cli/v29/ignite/pkg/errors"
+	"github.com/ignite/cli/v29/ignite/services/plugin"
 )
 
 type app struct{}

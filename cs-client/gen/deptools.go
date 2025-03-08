@@ -3,7 +3,7 @@ package gen
 import (
 	"context"
 
-	"github.com/ignite/cli/v28/ignite/pkg/gocmd"
+	"github.com/ignite/cli/v29/ignite/pkg/gocmd"
 )
 
 func DepTools() []string {

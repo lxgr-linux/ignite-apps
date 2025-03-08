@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/ignite/apps/cs-client/gen"
-	"github.com/ignite/cli/v28/ignite/services/plugin"
+	"github.com/ignite/cli/v29/ignite/services/plugin"
 )
 
 // GetCommands returns the list of spinner app commands.
