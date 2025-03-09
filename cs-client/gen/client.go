@@ -3,7 +3,6 @@ package gen
 import (
 	"context"
 	_ "embed"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,6 +14,9 @@ import (
 
 //go:embed templates/TxClient.cs.tpl
 var txClientTmpl string
+
+//go:embed templates/QueryClient.cs.tpl
+var queryClientTmpl string
 
 type ClientModel struct {
 	NameSpace string
@@ -44,8 +46,6 @@ func (g generator) GenerateClient(ctx context.Context) error {
 
 	for _, pkg := range pkgs {
 		for _, service := range pkg.Services {
-			fmt.Printf("%s, %s, %s\n", pkg.ModuleName(), service.Name, strings.Title(pkg.Name))
-
 			s := ServiceModel{
 				Type: service.Name,
 				Path: descriptor.FromTypeUrl(pkg.Name).CutNameSpace(descriptor.FromTypeUrl(g.modulePath.Package)),
@@ -65,14 +65,31 @@ func (g generator) GenerateClient(ctx context.Context) error {
 		return err
 	}
 
-	path := filepath.Join(g.outPath, txClientModel.NameSpace, "Client.cs")
+	path := filepath.Join(g.outPath, txClientModel.NameSpace, "TxClient.cs")
 	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	return tmpl.Execute(f, txClientModel)
+	err = tmpl.Execute(f, txClientModel)
+	if err != nil {
+		return err
+	}
+
+	tmpl, err = template.New("queryClient").Parse(queryClientTmpl)
+	if err != nil {
+		return err
+	}
+
+	path = filepath.Join(g.outPath, txClientModel.NameSpace, "QueryClient.cs")
+	f, err = os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return tmpl.Execute(f, queryClientModel)
 }
 
 func getSimpleModuleNameFromPath(path string) string {

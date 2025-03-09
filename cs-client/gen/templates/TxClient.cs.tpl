@@ -3,7 +3,7 @@ using Cosmcs.Client;
 
 namespace {{ .NameSpace }}
 {
-    public class Client
+    public class TxClient
     {
         public EasyClient Ec { get; }
         public QueryClient QueryClient { get; }
@@ -11,7 +11,7 @@ namespace {{ .NameSpace }}
         public {{ .Path }}.{{ .Type }}Client {{ .Name }}TxClient { get; }
         {{- end }}
 
-        public Client(QueryClient queryClient, string chainId, byte[] bytes)
+        public TxClient(QueryClient queryClient, string chainId, byte[] bytes)
         {
             Ec = new EasyClient( queryClient, chainId, bytes, "cosmos");
             QueryClient = queryClient;
