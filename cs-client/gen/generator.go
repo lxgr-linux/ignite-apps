@@ -30,15 +30,10 @@ type generator struct {
 	/*csModulePath string*/
 }
 
-func New(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.ClientAPI) (*generator, error) {
+func New(ctx context.Context, cmd *plugin.ExecutedCommand, chainInfo *plugin.ChainInfo) (*generator, error) {
 	flags, err := cmd.NewFlags()
 	if err != nil {
 		return nil, err
-	}
-
-	chainInfo, err := api.GetChainInfo(ctx)
-	if err != nil {
-		return nil, errors.Errorf("failed to get chain info: %s", err)
 	}
 
 	ch, err := chain.New(chainInfo.AppPath)
@@ -76,13 +71,6 @@ func New(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.ClientAPI)
 	if err != nil {
 		return nil, err
 	}
-
-	//fmt.Printf("modPath: %s", modPath.Package)
-
-	/*err = InstallDepTools(ctx)
-	if err != nil {
-		return nil, err
-		}*/
 
 	gen := generator{
 		modulePath: modPath,

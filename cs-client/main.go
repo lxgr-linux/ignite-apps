@@ -5,6 +5,7 @@ import (
 
 	hplugin "github.com/hashicorp/go-plugin"
 	"github.com/ignite/apps/cs-client/cmd"
+	"github.com/ignite/apps/cs-client/deptools"
 	"github.com/ignite/apps/cs-client/gen"
 	"github.com/ignite/cli/v29/ignite/pkg/cliui"
 	"github.com/ignite/cli/v29/ignite/pkg/errors"
@@ -24,7 +25,12 @@ func (app) Execute(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.
 	session := cliui.New(cliui.StartSpinnerWithText("Testing spinner..."))
 	defer session.End()
 
-	g, err := gen.New(ctx, cmd, api)
+	chainInfo, err := api.GetChainInfo(ctx)
+	if err != nil {
+		return errors.Errorf("failed to get chain info: %s", err)
+	}
+
+	g, err := gen.New(ctx, cmd, chainInfo)
 	if err != nil {
 		return errors.Errorf("failed to init genrator: %s", err)
 	}
@@ -35,7 +41,10 @@ func (app) Execute(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.
 	session.StopSpinner()
 
 	session.StartSpinner("Installing dependencies...")
-	gen.InstallDepTools(ctx)
+	err = deptools.ProvideTools(ctx, chainInfo.AppPath)
+	if err != nil {
+		return err
+	}
 	session.StopSpinner()
 
 	err = g.GenerateClients(ctx)
