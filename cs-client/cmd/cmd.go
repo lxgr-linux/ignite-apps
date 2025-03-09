@@ -16,7 +16,18 @@ func GetCommands() []*plugin.Command {
 			Short: "Generates csharp client",
 			Long:  "Generates csharp client",
 			Flags: []*plugin.Flag{
-				{Name: "out", Type: plugin.FlagTypeString, Usage: "csharp output directory"},
+				{
+					Name:      "yes",
+					Shorthand: "y",
+					Type:      plugin.FlagTypeBool,
+					Usage:     "answers interactive yes/no questions with yes",
+				},
+				{
+					Name:      "out",
+					Shorthand: "o",
+					Type:      plugin.FlagTypeString,
+					Usage:     "csharp output directory",
+				},
 				{
 					Name: "components",
 					Type: plugin.FlagTypeStringSlice,
