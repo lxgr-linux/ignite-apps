@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	_ "embed"
-	"fmt"
 	"text/template"
 
 	"github.com/ignite/cli/v29/ignite/pkg/cosmosbuf"
@@ -41,8 +40,6 @@ func (g generator) createBufGenYaml() (string, error) {
 }
 
 func (g generator) GenerateClients(ctx context.Context) error {
-	fmt.Println("Generating clients...")
-
 	buf, err := cosmosbuf.New(g.storage, g.appPath)
 	if err != nil {
 		return err

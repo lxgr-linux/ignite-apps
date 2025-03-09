@@ -2,7 +2,6 @@ package gen
 
 import (
 	"context"
-	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -78,7 +77,7 @@ func New(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.ClientAPI)
 		return nil, err
 	}
 
-	fmt.Printf("modPath: %s", modPath.Package)
+	//fmt.Printf("modPath: %s", modPath.Package)
 
 	/*err = InstallDepTools(ctx)
 	if err != nil {

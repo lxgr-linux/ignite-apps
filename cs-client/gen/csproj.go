@@ -2,7 +2,6 @@ package gen
 
 import (
 	_ "embed"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -19,7 +18,6 @@ type csprojModel struct {
 }
 
 func (g generator) GenerateCsproj() error {
-	fmt.Println("Generating csproj...")
 	m := csprojModel{
 		URL:       "https://" + g.modulePath.RawPath,
 		Name:      strings.Title(g.modulePath.Package),

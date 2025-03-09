@@ -43,10 +43,17 @@ func (app) Execute(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.
 		return err
 	}
 
+	session.StartSpinner("Generating...")
 	err = g.GenerateCsproj()
 	if err != nil {
 		return err
 	}
+
+	err = g.GenerateClient(ctx)
+	if err != nil {
+		return err
+	}
+	session.StopSpinner()
 	return nil
 }
 

@@ -3,6 +3,7 @@ module github.com/ignite/apps/cs-client
 go 1.23.6
 
 require (
+	github.com/DecentralCardGame/protoc-gen-cosmos-csharp v0.1.3
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/ignite/cli/v29 v29.0.0-beta.1
 	gopkg.in/yaml.v3 v3.0.1
