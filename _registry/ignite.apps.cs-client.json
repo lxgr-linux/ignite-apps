@@ -1,0 +1,24 @@
+{
+  "appName": "CsClient",
+  "slug": "cs-client",
+  "appDescription": "Generates a C# client library for a cosmos-sdk blockchain",
+  "ignite": ">28.3.0",
+  "dependencies": {},
+  "cosmosSDK": ">0.50.4",
+  "authors": [
+    {
+      "name": "Peer Meyer",
+      "github": "lxgr-linux"
+    }
+  ],
+  "repositoryUrl": "https://github.com/ignite/apps/cs-client",
+  "documentationUrl": "https://github.com/ignite/apps/blob/main/cs-client/README.md",
+  "license": {
+    "name": "MIT",
+    "url": "https://github.com/ignite/apps/blob/main/LICENSE"
+  },
+  "keywords": ["c#", "client", "cli", "cosmos-sdk", "ignite app"],
+  "supportedPlatforms": ["mac", "linux"],
+  "icon": "",
+  "cover": ""
+}
