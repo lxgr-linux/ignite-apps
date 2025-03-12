@@ -19,12 +19,12 @@ var txClientTmpl string
 var queryClientTmpl string
 
 type ClientModel struct {
-	NameSpace string
+	NameSpace descriptor.Descriptor
 	Services  []ServiceModel
 }
 
 type ServiceModel struct {
-	Path descriptor.Desriptor
+	Path descriptor.Descriptor
 	Name string
 	Type string
 }
@@ -37,19 +37,20 @@ func (g generator) GenerateClient(ctx context.Context) error {
 	}
 
 	queryClientModel := ClientModel{
-		NameSpace: strings.Title(g.modulePath.Package),
+		NameSpace: g.csNameSpace,
 	}
 
 	txClientModel := ClientModel{
-		NameSpace: strings.Title(g.modulePath.Package),
+		NameSpace: g.csNameSpace,
 	}
 
 	for _, pkg := range pkgs {
 		for _, service := range pkg.Services {
+			name := descriptor.FromTypeUrl(pkg.Name)
 			s := ServiceModel{
 				Type: service.Name,
-				Path: descriptor.FromTypeUrl(pkg.Name).CutNameSpace(descriptor.FromTypeUrl(g.modulePath.Package)),
-				Name: getSimpleModuleNameFromPath(pkg.Name),
+				Path: name.CutNameSpace(g.csNameSpace),
+				Name: getSimpleName(name),
 			}
 			switch service.Name {
 			case "Query":
@@ -60,12 +61,14 @@ func (g generator) GenerateClient(ctx context.Context) error {
 		}
 	}
 
+	baseOutPath := filepath.Join(g.outPath, g.csNameSpace.Name())
+
 	tmpl, err := template.New("txClient").Parse(txClientTmpl)
 	if err != nil {
 		return err
 	}
 
-	path := filepath.Join(g.outPath, txClientModel.NameSpace, "TxClient.cs")
+	path := filepath.Join(baseOutPath, "TxClient.cs")
 	f, err := os.Create(path)
 	if err != nil {
 		return err
@@ -82,7 +85,7 @@ func (g generator) GenerateClient(ctx context.Context) error {
 		return err
 	}
 
-	path = filepath.Join(g.outPath, txClientModel.NameSpace, "QueryClient.cs")
+	path = filepath.Join(baseOutPath, "QueryClient.cs")
 	f, err = os.Create(path)
 	if err != nil {
 		return err
@@ -92,12 +95,10 @@ func (g generator) GenerateClient(ctx context.Context) error {
 	return tmpl.Execute(f, queryClientModel)
 }
 
-func getSimpleModuleNameFromPath(path string) string {
-	s := strings.Split(path, ".")
-
-	if strings.Contains(s[len(s)-1], "v1") {
-		return strings.Title(s[len(s)-2]) + strings.Title(s[len(s)-1])
-	} else {
-		return strings.Title(s[len(s)-1])
+func getSimpleName(d descriptor.Descriptor) string {
+	name := d.Name()
+	if strings.Contains(name, "v1") {
+		return d.Parent().Name() + name
 	}
+	return name
 }

@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/DecentralCardGame/protoc-gen-cosmos-csharp/descriptor"
 	"github.com/ignite/apps/cs-client/customconfig"
 	"github.com/ignite/cli/v29/ignite/config"
 	chainconfig "github.com/ignite/cli/v29/ignite/config/chain"
@@ -17,16 +18,19 @@ import (
 	"github.com/ignite/cli/v29/ignite/version"
 )
 
-const cacheFileName = "ignite_cache.db"
-const flagClearCache = "clear-cache"
+const (
+	cacheFileName  = "ignite_cache.db"
+	flagClearCache = "clear-cache"
+)
 
 type generator struct {
-	modulePath gomodulepath.Path
-	config     *chainconfig.Config
-	storage    cache.Storage
-	appPath    string
-	protoPath  string
-	outPath    string
+	modulePath  gomodulepath.Path
+	config      *chainconfig.Config
+	storage     cache.Storage
+	appPath     string
+	protoPath   string
+	outPath     string
+	csNameSpace descriptor.Descriptor
 	/*csModulePath string*/
 }
 
@@ -73,12 +77,13 @@ func New(ctx context.Context, cmd *plugin.ExecutedCommand, chainInfo *plugin.Cha
 	}
 
 	gen := generator{
-		modulePath: modPath,
-		outPath:    out,
-		config:     config,
-		storage:    storage,
-		appPath:    ch.AppPath(),
-		protoPath:  filepath.Join(ch.AppPath(), config.Build.Proto.Path),
+		modulePath:  modPath,
+		outPath:     out,
+		config:      config,
+		storage:     storage,
+		appPath:     ch.AppPath(),
+		protoPath:   filepath.Join(ch.AppPath(), config.Build.Proto.Path),
+		csNameSpace: descriptor.FromTypeUrl(modPath.Package),
 	}
 
 	return &gen, nil

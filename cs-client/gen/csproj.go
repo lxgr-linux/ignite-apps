@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"os"
 	"path/filepath"
-	"strings"
 	"text/template"
 )
 
@@ -20,7 +19,7 @@ type csprojModel struct {
 func (g generator) GenerateCsproj() error {
 	m := csprojModel{
 		URL:       "https://" + g.modulePath.RawPath,
-		Name:      strings.Title(g.modulePath.Package),
+		Name:      g.csNameSpace.String(),
 		ShortName: g.modulePath.Package,
 	}
 
@@ -29,7 +28,7 @@ func (g generator) GenerateCsproj() error {
 		return err
 	}
 
-	path := filepath.Join(g.outPath, strings.Title(g.modulePath.Package)+".csproj")
+	path := filepath.Join(g.outPath, g.csNameSpace.String()+".csproj")
 	f, err := os.Create(path)
 	if err != nil {
 		return err
