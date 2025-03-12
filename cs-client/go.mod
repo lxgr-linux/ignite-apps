@@ -6,6 +6,7 @@ require (
 	github.com/DecentralCardGame/protoc-gen-cosmos-csharp v0.1.5
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/ignite/cli/v29 v29.0.0-beta.1
+	github.com/stretchr/testify v1.10.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -198,7 +199,6 @@ require (
 	github.com/spf13/cobra v1.9.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/spf13/viper v1.19.0 // indirect
-	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
