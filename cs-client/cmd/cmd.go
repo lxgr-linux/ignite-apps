@@ -1,10 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"strings"
-
-	"github.com/ignite/apps/cs-client/gen"
 	"github.com/ignite/cli/v29/ignite/services/plugin"
 )
 
@@ -27,14 +23,6 @@ func GetCommands() []*plugin.Command {
 					Shorthand: "o",
 					Type:      plugin.FlagTypeString,
 					Usage:     "csharp output directory",
-				},
-				{
-					Name: "components",
-					Type: plugin.FlagTypeStringSlice,
-					Usage: fmt.Sprintf(
-						"components to be generated; options: [%s]",
-						strings.Join(gen.Component_stringValues(), ", "),
-					),
 				},
 			},
 			PlaceCommandUnder: "generate",
