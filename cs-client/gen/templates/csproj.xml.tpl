@@ -22,6 +22,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Cosmcs" Version="0.7.0-rc2"/>
+		<PackageReference Include="Cosmcs" Version="{{ .CosmcsVersion }}"/>
 	</ItemGroup>
 </Project>
