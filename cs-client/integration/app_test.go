@@ -34,6 +34,13 @@ func TestCsClient(t *testing.T) {
 	assertLocalPlugins(t, app, []pluginsconfig.Plugin{{Path: pluginPath}})
 	assertGlobalPlugins(t, nil)
 
+	env.Must(env.Exec("generate client code",
+		step.NewSteps(step.New(
+			step.Exec(envtest.IgniteApp, "generate", "cs-client", "-y", "-o=outpath"),
+			step.Workdir(app.SourcePath()),
+		)),
+	))
+
 	/*output := &bytes.Buffer{}
 	steps := step.NewSteps(
 		step.New(

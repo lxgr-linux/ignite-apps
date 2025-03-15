@@ -31,7 +31,6 @@ type generator struct {
 	protoPath   string
 	outPath     string
 	csNameSpace descriptor.Descriptor
-	/*csModulePath string*/
 }
 
 func New(ctx context.Context, cmd *plugin.ExecutedCommand, chainInfo *plugin.ChainInfo) (*generator, error) {
