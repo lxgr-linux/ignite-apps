@@ -16,4 +16,5 @@ use (
 	./rollkit
 	./spaceship
 	./wasm
+	./cs-client
 )

@@ -18,6 +18,9 @@ apps:
   consumer:
     description: Internal Ignite App for scaffolding consumer chains (not to be installed manually)
     path: ./consumer
+  cs-client:
+    description: Generates a C# client library for your cosmos-sdk blockchain
+    path: ./cs-client
   rollkit:
     description: Scaffold a RollKit application with ease
     path: ./rollkit
