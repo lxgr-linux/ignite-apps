@@ -62,6 +62,12 @@ func (app) Execute(ctx context.Context, cmd *plugin.ExecutedCommand, api plugin.
 	if err != nil {
 		return err
 	}
+
+	err = g.InstallStaticFiles()
+	if err != nil {
+		return err
+	}
+
 	session.StopSpinner()
 	return nil
 }
