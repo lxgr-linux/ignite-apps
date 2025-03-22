@@ -75,6 +75,10 @@ func InstallDepTools(ctx context.Context, appPath string) error {
 		return err
 	}
 
+	if err := gocmd.Get(ctx, appPath, []string{"github.com/bufbuild/buf/cmd/buf@v1.50.0"}); err != nil {
+		return err
+	}
+
 	err := gocmd.Install(ctx, appPath, DepTools())
 	if err != nil {
 		return err
