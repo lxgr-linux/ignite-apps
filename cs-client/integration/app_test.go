@@ -1,10 +1,18 @@
 package integration_test
 
 import (
+	"bytes"
+	"context"
+	"embed"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"sync"
 	"testing"
+	"time"
 
+	"github.com/ignite/apps/cs-client/gen"
 	pluginsconfig "github.com/ignite/cli/v29/ignite/config/plugins"
 	"github.com/ignite/cli/v29/ignite/pkg/cmdrunner/step"
 	"github.com/ignite/cli/v29/ignite/services/plugin"
@@ -12,16 +20,25 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+//go:embed static/*
+var staticFiles embed.FS
+
 func TestCsClient(t *testing.T) {
 	var (
-		require = require.New(t)
-		env     = envtest.New(t)
-		app     = env.Scaffold("github.com/a/niceChain")
+		require     = require.New(t)
+		env         = envtest.New(t)
+		app         = env.Scaffold("github.com/a/niceChain")
+		servers     = app.RandomizeServerPorts()
+		ctx, cancel = context.WithCancel(env.Ctx())
 	)
 
 	dir, err := os.Getwd()
 	require.NoError(err)
 	pluginPath := filepath.Join(filepath.Dir(filepath.Dir(dir)), "cs-client")
+
+	homeDir := app.UseRandomHomeDir()
+
+	require.NoError(gen.InstallStaticFiles(staticFiles, app.SourcePath(), "static"))
 
 	env.Must(env.Exec("install cs-client app locally",
 		step.NewSteps(step.New(
@@ -36,7 +53,14 @@ func TestCsClient(t *testing.T) {
 
 	var outPath = "outpath"
 
-	env.Must(env.Exec("generate client code",
+	env.Must(env.Exec("scaffold testitem",
+		step.NewSteps(step.New(
+			step.Exec(envtest.IgniteApp, "scaffold", "list", "testItem", "-y"),
+			step.Workdir(app.SourcePath()),
+		)),
+	))
+
+	env.Must(env.Exec("client gen",
 		step.NewSteps(step.New(
 			step.Exec(envtest.IgniteApp, "generate", "cs-client", "-y", "-o="+outPath),
 			step.Workdir(app.SourcePath()),
@@ -50,44 +74,63 @@ func TestCsClient(t *testing.T) {
 		)),
 	))
 
-	/*output := &bytes.Buffer{}
-	steps := step.NewSteps(
-		step.New(
-			step.Stdout(output),
+	// Getting testing data
+	o := &bytes.Buffer{}
+	env.Must(env.Exec("init chain",
+		step.NewSteps(step.New(
+			step.Stdout(o),
+			step.Exec(envtest.IgniteApp, "chain", "init", "-y", "--home", homeDir),
 			step.Workdir(app.SourcePath()),
-			step.PreExec(func() error {
-				return env.IsAppServed(ctx, servers.API)
-			}),
-			step.Exec(
-				envtest.IgniteApp,
-				"health-monitor",
-				"monitor",
-				"--rpc-address", servers.RPC,
-				"--refresh-duration", "1s",
-			),
-			step.InExec(func() error {
-				time.Sleep(2 * time.Second)
-				cancel()
-				return nil
-			}),
-		),
-	)
+		)),
+	))
 
-	var wg sync.WaitGroup
+	output := &bytes.Buffer{}
+
+	env.Must(env.Exec("export keys",
+		step.NewSteps(step.New(
+			step.Stdout(output),
+			step.Exec(app.Binary(), "keys", "export", "alice", "--unsafe", "--unarmored-hex", "--home", homeDir),
+			step.Workdir(app.SourcePath()),
+			step.Stdin(strings.NewReader("y\n")),
+		)),
+	))
+
+	fmt.Println("yes")
+
+	wg := sync.WaitGroup{}
 	wg.Add(1)
+
 	go func() {
-		env.Must(env.Exec("run health-monitor", steps, envtest.ExecRetry(), envtest.ExecCtx(ctx)))
+		env.Must(env.Exec("should serve",
+			step.NewSteps(step.New(
+				step.Stdout(o),
+				step.Exec(app.Binary(), "start", "--grpc.address", servers.GRPC, "--home", homeDir),
+				step.Workdir(app.SourcePath()),
+			)),
+			envtest.ExecCtx(ctx),
+		))
 		wg.Done()
 	}()
 
-	env.Must(app.Serve("should serve", envtest.ExecCtx(ctx)))
+	time.Sleep(5)
+	fmt.Println(o.String() + "\n----")
+
+	env.Exec("run testapp",
+		step.NewSteps(step.New(
+			/*step.PreExec(func() error {
+				return env.IsAppServed(ctx, servers.API)
+			}),*/
+			step.Exec("dotnet", "run", strings.TrimSuffix(output.String(), "\n"), "http://"+servers.GRPC),
+			step.Workdir(filepath.Join(app.SourcePath(), "testApp")),
+		)),
+		//envtest.ExecRetry(),
+	)
+
+	cancel()
+
+	//fmt.Println(o.String())
 
 	wg.Wait()
-	got := output.String()
-	require.Contains(got, "Chain ID: healthmonitor")
-	require.Contains(got, "Version:")
-	require.Contains(got, "Height:")
-	require.Contains(got, "Latest Block Hash:")*/
 }
 
 func assertLocalPlugins(t *testing.T, app envtest.App, expectedPlugins []pluginsconfig.Plugin) {

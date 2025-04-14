@@ -7,7 +7,7 @@ import (
 	"text/template"
 )
 
-const COSMCS_VERSION = "0.7.0-rc3"
+const COSMCS_VERSION = "0.7.0-rc4"
 
 //go:embed templates/csproj.xml.tpl
 var csprojTmpl string

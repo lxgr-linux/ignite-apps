@@ -97,7 +97,7 @@ func (g generator) GenerateClient(ctx context.Context) error {
 
 func getSimpleName(d descriptor.Descriptor) string {
 	name := d.Name()
-	if strings.Contains(name, "v1") {
+	if strings.Contains(name, "V1") {
 		return d.Parent().Name() + name
 	}
 	return name

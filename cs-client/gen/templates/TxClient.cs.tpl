@@ -11,9 +11,9 @@ namespace {{ .NameSpace }}
         public {{ .Path }}.{{ .Type }}Client {{ .Name }}TxClient { get; }
         {{- end }}
 
-        public TxClient(QueryClient queryClient, string chainId, byte[] privateKey)
+        public TxClient(QueryClient queryClient, byte[] privateKey)
         {
-            Ec = new EasyClient( queryClient, chainId, privateKey);
+            Ec = new EasyClient(queryClient, privateKey);
             QueryClient = queryClient;
             {{- range .Services }}
             {{ .Name }}TxClient = new {{ .Path }}.{{ .Type }}Client(Ec);
