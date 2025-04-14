@@ -4,13 +4,11 @@ import (
 	"bytes"
 	"context"
 	"embed"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/ignite/apps/cs-client/gen"
 	pluginsconfig "github.com/ignite/cli/v29/ignite/config/plugins"
@@ -75,10 +73,8 @@ func TestCsClient(t *testing.T) {
 	))
 
 	// Getting testing data
-	o := &bytes.Buffer{}
 	env.Must(env.Exec("init chain",
 		step.NewSteps(step.New(
-			step.Stdout(o),
 			step.Exec(envtest.IgniteApp, "chain", "init", "-y", "--home", homeDir),
 			step.Workdir(app.SourcePath()),
 		)),
@@ -95,16 +91,12 @@ func TestCsClient(t *testing.T) {
 		)),
 	))
 
-	fmt.Println("yes")
-
 	wg := sync.WaitGroup{}
 	wg.Add(1)
-
 	go func() {
 		env.Must(env.Exec("should serve",
 			step.NewSteps(step.New(
-				step.Stdout(o),
-				step.Exec(app.Binary(), "start", "--grpc.address", servers.GRPC, "--home", homeDir),
+				step.Exec(app.Binary(), "start", "--grpc.address", servers.GRPC, "--api.address", "tcp://"+servers.API, "--home", homeDir),
 				step.Workdir(app.SourcePath()),
 			)),
 			envtest.ExecCtx(ctx),
@@ -112,23 +104,17 @@ func TestCsClient(t *testing.T) {
 		wg.Done()
 	}()
 
-	time.Sleep(5)
-	fmt.Println(o.String() + "\n----")
-
 	env.Exec("run testapp",
 		step.NewSteps(step.New(
-			/*step.PreExec(func() error {
+			step.PreExec(func() error {
 				return env.IsAppServed(ctx, servers.API)
-			}),*/
+			}),
 			step.Exec("dotnet", "run", strings.TrimSuffix(output.String(), "\n"), "http://"+servers.GRPC),
 			step.Workdir(filepath.Join(app.SourcePath(), "testApp")),
 		)),
-		//envtest.ExecRetry(),
 	)
 
 	cancel()
-
-	//fmt.Println(o.String())
 
 	wg.Wait()
 }
