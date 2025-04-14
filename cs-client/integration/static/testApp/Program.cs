@@ -1,9 +1,6 @@
 using System.Net;
 using Nicechain;
 
-System.Net.ServicePointManager.SecurityProtocol =
-    SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-
 static byte[] StringToByteArray(string hex)
 {
     return Enumerable.Range(0, hex.Length)
@@ -12,12 +9,11 @@ static byte[] StringToByteArray(string hex)
                      .ToArray();
 }
 
-Console.Out.WriteLine($"{args[0]}, {args[1]}");
+byte[] privateKey = StringToByteArray(args[0]);
+String grpcURL = args[1];
 
-byte[] hex = StringToByteArray(args[0]);
-
-var queryClient = new QueryClient(args[1]);
-var txClient = new TxClient(queryClient, hex);
+var queryClient = new QueryClient(grpcURL);
+var txClient = new TxClient(queryClient, privateKey);
 
 await txClient.NicechainV1TxClient.SendMsgCreateTestItem(
     new Nicechain.Nicechain.V1.MsgCreateTestItem
