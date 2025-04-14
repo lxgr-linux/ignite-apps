@@ -12,8 +12,6 @@ static byte[] StringToByteArray(string hex)
                      .ToArray();
 }
 
-//var args = Environment.GetCommandLineArgs();
-
 Console.Out.WriteLine($"{args[0]}, {args[1]}");
 
 byte[] hex = StringToByteArray(args[0]);
